@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Rhythm — Reclaim Your Focus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+/* ── HOME-SPECIFIC STYLES ──────────────────────────────── */
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 8rem 5vw 5rem;
+  background: var(--w);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 55% at 68% 52%, rgba(45,90,61,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 15% 75%, rgba(124,32,53,.04) 0%, transparent 60%);
+}
+.hero-rings {
+  position: absolute;
+  top: 50%; right: 4%;
+  transform: translateY(-50%);
+  width: 460px; height: 460px;
+}
+.hero-content { position: relative; z-index: 1; max-width: 640px; }
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block; width: 2rem; height: 1px;
+  background: var(--b);
+}
+.hero h1 { margin-bottom: 1.2rem; color: var(--g); }
+.hero h1 em { font-style: italic; color: var(--b); }
+.hero-sub {
+  font-size: .98rem; color: var(--dim);
+  max-width: 440px; margin-bottom: 2.2rem;
+  line-height: 1.75;
+}
+.hero-cta { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+
+/* Trust strip under hero */
+.trust-strip {
+  background: var(--g);
+  padding: 1.4rem 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.trust-item {
+  display: flex; align-items: center; gap: .6rem;
+  color: rgba(255,255,255,.75);
+  font-size: .8rem;
+}
+.trust-item .ti-ico { font-size: 1rem; color: var(--gl); }
+
+/* Feature strip */
+.feat-strip {
+  background: var(--paper);
+  padding: 4rem 5vw;
+}
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 2rem auto 0;
+}
+.feat-card {
+  background: var(--w);
+  border: 1px solid var(--mist);
+  border-radius: var(--r);
+  padding: 1.75rem;
+  box-shadow: var(--sh);
+  transition: all var(--T);
+}
+.feat-card:hover { border-color: var(--gb); box-shadow: var(--shm); transform: translateY(-2px); }
+.feat-ico {
+  width: 44px; height: 44px;
+  border-radius: var(--r);
+  background: var(--gs);
+  border: 1px solid var(--gb);
+  display: grid; place-items: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+.feat-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 400;
+  color: var(--g); margin-bottom: .45rem;
+}
+.feat-card p { font-size: .82rem; color: var(--dim); line-height: 1.6; }
+.feat-learn {
+  display: inline-flex; align-items: center; gap: .3rem;
+  margin-top: .85rem; font-size: .75rem;
+  color: var(--b); text-decoration: none;
+  letter-spacing: .04em;
+  transition: gap var(--T);
+}
+.feat-learn:hover { gap: .6rem; }
+
+/* How it works */
+.how-sec { background: var(--w); }
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 0;
+  border: 1px solid var(--mist);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-top: 2.5rem;
+}
+.how-step {
+  padding: 2rem 1.75rem;
+  border-right: 1px solid var(--mist);
+  position: relative;
+  transition: background var(--T);
+}
+.how-step:last-child { border-right: none; }
+.how-step:hover { background: var(--gs); }
+.how-step::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--g), transparent);
+  opacity: 0;
+  transition: opacity var(--T);
+}
+.how-step:hover::before { opacity: 1; }
+.step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem; font-weight: 300;
+  color: var(--mist); line-height: 1;
+  margin-bottom: 1rem;
+}
+.how-step h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem; font-weight: 400;
+  color: var(--g); margin-bottom: .45rem;
+}
+.how-step p { font-size: .82rem; color: var(--dim); line-height: 1.6; }
+
+/* Screenshots / preview mockup */
+.preview-sec { background: var(--g); padding: 5rem 5vw; overflow: hidden; position: relative; }
+.preview-sec::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 50% 60% at 80% 50%, rgba(255,255,255,.04) 0%, transparent 70%);
+}
+.preview-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative; z-index: 1;
+}
+.preview-text .lbl { color: rgba(255,255,255,.45); }
+.preview-text h2 { color: #fff; margin: .75rem 0 1rem; }
+.preview-text p { color: rgba(255,255,255,.6); line-height: 1.7; margin-bottom: 1.5rem; font-size: .95rem; }
+.preview-check-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; margin-bottom: 2rem; }
+.preview-check-list li {
+  display: flex; align-items: flex-start; gap: .75rem;
+  font-size: .85rem; color: rgba(255,255,255,.7);
+}
+.preview-check-list .chk {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--gs); border: 1px solid var(--gb);
+  display: grid; place-items: center;
+  flex-shrink: 0; margin-top: 1px;
+  font-size: .65rem; color: var(--gl);
+}
+
+/* Dashboard mockup card */
+.mockup-card {
+  background: var(--w);
+  border-radius: var(--r);
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  overflow: hidden;
+  transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+  transition: transform .4s ease;
+}
+.mockup-card:hover { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+.mc-bar {
+  background: var(--off);
+  padding: .7rem 1rem;
+  display: flex; align-items: center; gap: .6rem;
+  border-bottom: 1px solid var(--mist);
+}
+.mc-dots { display: flex; gap: 5px; }
+.mc-dots span { width: 8px; height: 8px; border-radius: 50%; }
+.mc-dot-r { background: #ff5f57; }
+.mc-dot-y { background: #febc2e; }
+.mc-dot-g { background: #28c840; }
+.mc-url {
+  flex: 1; background: var(--w);
+  border-radius: 4px; padding: .25rem .65rem;
+  font-size: .68rem; color: var(--mid);
+  font-family: monospace; border: 1px solid var(--mist);
+}
+.mc-body { padding: 1.25rem; }
+/* Mini greeting in mockup */
+.mc-greeting {
+  background: linear-gradient(135deg, var(--g), var(--gm));
+  border-radius: var(--r); padding: .9rem 1.1rem;
+  margin-bottom: .9rem;
+}
+.mc-greeting-txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; color: #fff; font-weight: 300;
+}
+.mc-greeting-txt em { font-style: italic; color: rgba(255,255,255,.65); }
+.mc-greeting-sub { font-size: .7rem; color: rgba(255,255,255,.5); margin-top: .2rem; }
+/* Mini KPI row */
+.mc-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; margin-bottom: .9rem; }
+.mc-kpi {
+  background: var(--off); border: 1px solid var(--mist);
+  border-radius: 4px; padding: .6rem .5rem;
+}
+.mc-kpi-l { font-size: .5rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mid); }
+.mc-kpi-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 300; color: var(--g); line-height: 1;
+}
+.mc-kpi-u { font-size: .55rem; color: var(--b); }
+/* Mini habits list */
+.mc-habits { }
+.mc-hab-row {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .38rem 0; border-bottom: 1px solid var(--paper);
+  font-size: .72rem; color: var(--g);
+}
+.mc-hab-row:last-child { border-bottom: none; }
+.mc-chk {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1.5px solid var(--mist); flex-shrink: 0;
+}
+.mc-chk.done { background: var(--g); border-color: var(--g); }
+.mc-hab-nm { flex: 1; }
+.mc-hab-nm.done { text-decoration: line-through; color: var(--mid); }
+.mc-ico { font-size: .75rem; }
+
+/* Download section */
+.dl-sec { background: var(--off); }
+.dl-inner {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+}
+.dl-text h2 { margin: .75rem 0 1rem; }
+.dl-text p { color: var(--dim); line-height: 1.7; margin-bottom: 1.5rem; font-size: .95rem; }
+.dl-card {
+  background: var(--w);
+  border: 1px solid var(--gb);
+  border-radius: var(--r);
+  padding: 2rem;
+  box-shadow: var(--shm);
+  text-align: center;
+}
+.dl-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--gs); border: 1px solid var(--gb);
+  display: grid; place-items: center;
+  margin: 0 auto 1.2rem;
+  font-size: 1.6rem;
+}
+.dl-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 300;
+  color: var(--g); margin-bottom: .4rem;
+}
+.dl-card .dl-sub { font-size: .78rem; color: var(--mid); margin-bottom: 1.5rem; }
+.dl-btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--g); color: #fff;
+  padding: .85rem 2rem; border-radius: var(--r);
+  font-size: .82rem; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase;
+  text-decoration: none; transition: all var(--T);
+  width: 100%; justify-content: center;
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.dl-btn:hover { background: var(--gm); transform: translateY(-1px); box-shadow: var(--shm); }
+.dl-toggle-note {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, var(--gs), var(--paper));
+  border: 1px solid var(--gb);
+  border-radius: var(--r);
+  padding: .85rem 1rem;
+  display: flex; align-items: center; gap: .65rem;
+}
+.dl-toggle-note .tog-demo {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .7rem; color: var(--g); font-weight: 500;
+}
+.tog-pill {
+  width: 32px; height: 18px;
+  background: var(--g); border-radius: 9px;
+  position: relative; flex-shrink: 0;
+}
+.tog-pill::after {
+  content: '';
+  position: absolute; top: 2px; right: 2px;
+  width: 14px; height: 14px;
+  background: #fff; border-radius: 50%;
+}
+.dl-toggle-note p {
+  font-size: .75rem; color: var(--dim); line-height: 1.5;
+}
+.dl-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .75rem; margin-top: 1.25rem;
+}
+.dl-stat {
+  background: var(--paper);
+  border-radius: var(--r); padding: .75rem;
+  text-align: center;
+}
+.dl-stat-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 300;
+  color: var(--g); line-height: 1;
+}
+.dl-stat-l { font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mid); margin-top: .2rem; }
+
+/* Testimonials */
+.test-sec { background: var(--w); }
+.test-header {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 1rem; margin-bottom: 2.5rem;
+}
+.t-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 1.25rem;
+}
+.t-card {
+  background: var(--paper);
+  border: 1px solid var(--mist);
+  border-radius: var(--r);
+  padding: 1.75rem;
+  transition: all var(--T);
+  display: flex; flex-direction: column;
+}
+.t-card:hover { box-shadow: var(--shm); border-color: var(--gb); transform: translateY(-2px); }
+.t-stars { color: var(--b); font-size: .85rem; margin-bottom: .75rem; letter-spacing: .1em; }
+.tq {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem; color: var(--b);
+  opacity: .2; line-height: .6;
+  margin-bottom: .65rem;
+}
+.tt {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem;
+  color: var(--dim); line-height: 1.65;
+  margin-bottom: 1.2rem; flex: 1;
+}
+.ta { display: flex; align-items: center; gap: .75rem; }
+.tav {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--g); color: #fff;
+  display: grid; place-items: center;
+  font-size: .78rem; font-weight: 600;
+  flex-shrink: 0;
+}
+.tn { font-size: .83rem; font-weight: 500; color: var(--g); }
+.tr { font-size: .7rem; color: var(--mid); }
+.td {
+  display: inline-block; margin-top: .3rem;
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  background: var(--gs); border: 1px solid var(--gb); color: var(--g);
+  padding: .15rem .5rem; border-radius: 100px;
+}
+
+/* Stats banner */
+.stats-banner {
+  background: var(--g);
+  padding: 3rem 5vw;
+  display: flex; align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.sb-stat {
+  text-align: center;
+  padding: 1rem 3.5rem;
+  border-right: 1px solid rgba(255,255,255,.12);
+}
+.sb-stat:last-child { border-right: none; }
+.sb-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem; font-weight: 300;
+  color: #fff; line-height: 1;
+}
+.sb-v span { color: var(--gl); }
+.sb-l { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: .3rem; }
+
+/* CTA section */
+.cta-sec {
+  background: var(--off);
+  padding: 5rem 5vw;
+  text-align: center;
+}
+.cta-sec h2 { margin: .75rem auto 1rem; max-width: 500px; }
+.cta-sec p { color: var(--dim); max-width: 420px; margin: 0 auto 2rem; line-height: 1.7; }
+.cta-btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .preview-inner { grid-template-columns: 1fr; }
+  .mockup-card { transform: none; }
+  .dl-inner { grid-template-columns: 1fr; }
+  .hero-rings { display: none; }
+  .sb-stat { padding: 1rem 2rem; }
+}
+@media (max-width: 600px) {
+  .how-grid { grid-template-columns: 1fr; }
+  .how-step { border-right: none; border-bottom: 1px solid var(--mist); }
+  .how-step:last-child { border-bottom: none; }
+  .stats-banner { gap: 1rem; }
+  .sb-stat { border-right: none; padding: .75rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ══ NAVIGATION ══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <a class="nav-logo" href="index.html">Rhythm<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="app.html#habits">Habits</a></li>
+    <li><a href="app.html#analytics">Analytics</a></li>
+    <li><a href="#sec-dl">Get Extension</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a class="btn btn-ghost btn-sm" href="login.html">Sign In</a>
+    <a class="btn btn-g btn-sm"    href="login.html#register">Get Started</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Animated rings -->
+  <div class="rings-wrap hero-rings">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="lbl">Habit tracker + site blocker</span>
+    </div>
+    <h1 class="serif xl">
+      Get back<br/><em>in tune</em><br/>with yourself.
+    </h1>
+    <p class="hero-sub">
+      Rhythm combines daily habit tracking, timed focus sessions, and intelligent
+      site blocking into one calm, privacy-first system — so you can build the
+      life you actually want.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-g btn-lg" href="login.html#register">Create Free Account</a>
+      <a class="btn btn-ghost btn-lg" href="#sec-dl">Download Extension</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST STRIP ══════════════════════════════════════════ -->
+<div class="trust-strip">
+  <div class="trust-item"><span class="ti-ico">🔒</span> 100% local data — nothing leaves your device</div>
+  <div class="trust-item"><span class="ti-ico">⊘</span> 136+ sites pre-blocked out of the box</div>
+  <div class="trust-item"><span class="ti-ico">◎</span> Free forever — no subscriptions</div>
+  <div class="trust-item"><span class="ti-ico">◷</span> Built-in Pomodoro focus timer</div>
+</div>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════ -->
+<section class="feat-strip sec-sm" id="sec-features">
+  <div class="inner">
+    <p class="lbl" style="margin-bottom:.7rem">What Rhythm does</p>
+    <h2 class="serif lg">Everything you need.<br/><em>Nothing you don't.</em></h2>
+    <div class="feat-grid">
+
+      <div class="feat-card reveal">
+        <div class="feat-ico">◎</div>
+        <h3>Habit Creation & Logging</h3>
+        <p>Build daily routines across health, learning, mindfulness, productivity, and recovery categories. Log completions in one tap and watch streaks grow.</p>
+        <a class="feat-learn" href="app.html#habits">Explore habits →</a>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-ico">◷</div>
+        <h3>Focus Sessions</h3>
+        <p>Pomodoro-style timer with 25/50/90-minute presets. Set a session goal, link it to a habit, and Rhythm blocks distractions automatically while you work.</p>
+        <a class="feat-learn" href="app.html#focus">Try a session →</a>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-ico">⊘</div>
+        <h3>Intelligent Site Blocking</h3>
+        <p>99+ pornographic and 37+ gambling domains blocked the moment you install. Add any custom domain in seconds. Toggle categories on or off anytime.</p>
+        <a class="feat-learn" href="#sec-dl">Get the extension →</a>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-ico">↗</div>
+        <h3>Analytics & Real-Time Monitoring</h3>
+        <p>28-day completion heatmaps, daily bar charts, focus line graphs, category breakdowns, and a live blocking monitor — all in your personal dashboard.</p>
+        <a class="feat-learn" href="app.html#analytics">View analytics →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════ -->
+<section class="how-sec sec" id="sec-how">
+  <div class="inner">
+    <div class="sec-hd">
+      <p class="lbl">How Rhythm works</p>
+      <h2 class="serif lg">Simple by design.<br/><em>Powerful in practice.</em></h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-step reveal">
+        <div class="step-num">01</div>
+        <h3>Create an account</h3>
+        <p>Register on the login page in under a minute. Your data is stored locally on your device — private and secure by default.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">02</div>
+        <h3>Define your habits</h3>
+        <p>Add habits across categories — health, learning, recovery, productivity. Set daily targets and optional reminder times.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">03</div>
+        <h3>Download the extension</h3>
+        <p>One download. Load it into Chrome once — then simply keep the toggle ON. Rhythm runs silently in the background.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">04</div>
+        <h3>Activate focus sessions</h3>
+        <p>Start a timed session from the app. Rhythm blocks all distracting sites in real time and logs your deep work automatically.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">05</div>
+        <h3>Review your progress</h3>
+        <p>Heatmaps, streaks, block counts, and focus minutes are visualised in your analytics dashboard — updated live.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PREVIEW MOCKUP ════════════════════════════════════════ -->
+<section class="preview-sec" id="sec-preview">
+  <div class="preview-inner">
+    <div class="preview-text">
+      <p class="lbl">Your dashboard</p>
+      <h2 class="serif lg">Everything in<br/><em style="color:rgba(255,255,255,.6)">one place.</em></h2>
+      <p>The Rhythm dashboard is your daily command centre — habits, focus timer, site blocking controls, and analytics all under one roof. When you install the extension, this page becomes fully active.</p>
+      <ul class="preview-check-list">
+        <li><span class="chk">✓</span>Live KPI cards update as you log and block</li>
+        <li><span class="chk">✓</span>Habit streak tracker with milestone progress bars</li>
+        <li><span class="chk">✓</span>Real-time blocking monitor during focus sessions</li>
+        <li><span class="chk">✓</span>Daily rotating recovery affirmations</li>
+        <li><span class="chk">✓</span>28-day completion heatmap and focus trend charts</li>
+      </ul>
+      <a class="btn btn-ghost" href="login.html#register" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.8)">Open Dashboard →</a>
+    </div>
+
+    <!-- Dashboard mockup -->
+    <div class="mockup-card">
+      <div class="mc-bar">
+        <div class="mc-dots">
+          <span class="mc-dot-r"></span>
+          <span class="mc-dot-y"></span>
+          <span class="mc-dot-g"></span>
+        </div>
+        <div class="mc-url">🔒 rhythm — dashboard</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-greeting">
+          <div class="mc-greeting-txt">Good morning, <em>Ashley.</em></div>
+          <div class="mc-greeting-sub">Here's your focus summary for today.</div>
+        </div>
+        <div class="mc-kpis">
+          <div class="mc-kpi">
+            <div class="mc-kpi-l">Streak</div>
+            <div class="mc-kpi-v">14<span class="mc-kpi-u"> d</span></div>
+          </div>
+          <div class="mc-kpi">
+            <div class="mc-kpi-l">Blocks</div>
+            <div class="mc-kpi-v">7</div>
+          </div>
+          <div class="mc-kpi">
+            <div class="mc-kpi-l">Focus</div>
+            <div class="mc-kpi-v">50<span class="mc-kpi-u"> m</span></div>
+          </div>
+          <div class="mc-kpi">
+            <div class="mc-kpi-l">Habits</div>
+            <div class="mc-kpi-v">3<span class="mc-kpi-u"> /4</span></div>
+          </div>
+        </div>
+        <div class="mc-habits">
+          <div class="mc-hab-row">
+            <div class="mc-chk done"></div>
+            <div class="mc-hab-nm done">Morning Walk</div>
+            <div class="mc-ico">🏃</div>
+          </div>
+          <div class="mc-hab-row">
+            <div class="mc-chk done"></div>
+            <div class="mc-hab-nm done">Read 30 min</div>
+            <div class="mc-ico">📖</div>
+          </div>
+          <div class="mc-hab-row">
+            <div class="mc-chk done"></div>
+            <div class="mc-hab-nm done">Daily Reflection</div>
+            <div class="mc-ico">🌿</div>
+          </div>
+          <div class="mc-hab-row">
+            <div class="mc-chk"></div>
+            <div class="mc-hab-nm">Drink 8 glasses</div>
+            <div class="mc-ico">💧</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS BANNER ══════════════════════════════════════════ -->
+<div class="stats-banner">
+  <div class="sb-stat">
+    <div class="sb-v">136<span>+</span></div>
+    <div class="sb-l">Sites Pre-Blocked</div>
+  </div>
+  <div class="sb-stat">
+    <div class="sb-v">0<span>%</span></div>
+    <div class="sb-l">Data Sent to Servers</div>
+  </div>
+  <div class="sb-stat">
+    <div class="sb-v">Free<span>.</span></div>
+    <div class="sb-l">Always & Forever</div>
+  </div>
+  <div class="sb-stat">
+    <div class="sb-v">4<span>+</span></div>
+    <div class="sb-l">Core Features</div>
+  </div>
+</div>
+
+<!-- ══ DOWNLOAD SECTION ══════════════════════════════════════ -->
+<section class="dl-sec sec" id="sec-dl">
+  <div class="inner dl-inner">
+    <div class="dl-text">
+      <p class="lbl">Chrome Extension</p>
+      <h2 class="serif lg">One download.<br/><em>Always on.</em></h2>
+      <p>Rhythm works as a Chrome extension that runs quietly in the background — blocking pornographic and gambling sites, monitoring focus sessions in real time, and connecting directly to your personal dashboard.</p>
+      <p style="font-size:.85rem;color:var(--mid);margin-top:-.5rem">No ongoing setup. No maintenance. Just keep the toggle ON.</p>
+    </div>
+
+    <div class="dl-card">
+      <div class="dl-icon">🌿</div>
+      <h3>Rhythm Extension</h3>
+      <p class="dl-sub">Version 2.0 · Chrome · Free forever</p>
+
+      <a class="dl-btn" href="rhythm-v2-extension.zip" download>
+        ↓ Download Extension
+      </a>
+
+      <div class="dl-toggle-note">
+        <div class="tog-demo">
+          <div class="tog-pill"></div>
+          Keep ON
+        </div>
+        <p>After loading the extension in Chrome, simply keep the extension toggle ON — that's all the setup you need.</p>
+      </div>
+
+      <div class="dl-stats">
+        <div class="dl-stat">
+          <div class="dl-stat-v">99<span style="font-size:.9rem;color:var(--b)">+</span></div>
+          <div class="dl-stat-l">Porn domains</div>
+        </div>
+        <div class="dl-stat">
+          <div class="dl-stat-v">37<span style="font-size:.9rem;color:var(--b)">+</span></div>
+          <div class="dl-stat-l">Gambling sites</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══════════════════════════════════════════ -->
+<section class="test-sec sec" id="sec-stories">
+  <div class="inner">
+    <div class="test-header">
+      <div>
+        <p class="lbl" style="margin-bottom:.7rem">Real stories</p>
+        <h2 class="serif lg">They found their<br/><em>rhythm again.</em></h2>
+      </div>
+      <a class="btn btn-ghost btn-sm" href="login.html#register">Join them →</a>
+    </div>
+
+    <div class="t-grid">
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">I tried everything — timers, accountability partners, cold showers. Nothing stuck. Rhythm is different because it doesn't shame you. It just quietly removes the option. After ninety days I got my mornings back.</p>
+        <div class="ta">
+          <div class="tav">DM</div>
+          <div>
+            <div class="tn">Daniel M.</div>
+            <div class="tr">Software engineer, Nairobi</div>
+            <span class="td">90 days clean</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">Gambling took four years of my life. Money meant for school fees. When I saw SportPesa blocked the first time, something broke in a good way. The habit was weaker than I thought. I haven't placed a bet in fourteen months.</p>
+        <div class="ta">
+          <div class="tav">JK</div>
+          <div>
+            <div class="tn">James K.</div>
+            <div class="tr">Father of two, Mombasa</div>
+            <span class="td">14 months free</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">I'm a therapist. I recommend Rhythm to clients working on compulsive internet use. The redirect page doesn't punish — it creates a moment of pause. That pause is where real change happens.</p>
+        <div class="ta">
+          <div class="tav">SA</div>
+          <div>
+            <div class="tn">Dr. Sarah A.</div>
+            <div class="tr">Counselling psychologist, Kampala</div>
+            <span class="td">Recommends to clients</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">I was watching pornography every single night. I didn't even enjoy it — it was automatic. Rhythm interrupted the pattern. The redirect page asks: who set this block? Me, sober. The one who wants better. I listen to that person now.</p>
+        <div class="ta">
+          <div class="tav">TN</div>
+          <div>
+            <div class="tn">Tobias N.</div>
+            <div class="tr">University student, Dar es Salaam</div>
+            <span class="td">7 months free</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">My marriage was suffering. I finally told my wife and started using Rhythm alongside counselling. Removing the easy path made the harder one worth trying. We're rebuilding something real.</p>
+        <div class="ta">
+          <div class="tav">RM</div>
+          <div>
+            <div class="tn">Robert M.</div>
+            <div class="tr">Married, Nairobi</div>
+            <span class="td">Rebuilding together</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-stars">★★★★★</div>
+        <div class="tq">"</div>
+        <p class="tt">I put Betika and Odibets on the list and forgot about Rhythm for two weeks. When I checked I'd saved 12,000 shillings. The impulse couldn't reach me fast enough. That money paid my rent.</p>
+        <div class="ta">
+          <div class="tav">PO</div>
+          <div>
+            <div class="tn">Patrick O.</div>
+            <div class="tr">Driver, Kisumu</div>
+            <span class="td">Saving every week</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOTTOM CTA ════════════════════════════════════════════ -->
+<section class="cta-sec">
+  <div class="inner" style="text-align:center">
+    <p class="lbl">Start today</p>
+    <h2 class="serif lg">Your rhythm is<br/><em>waiting for you.</em></h2>
+    <p>Create a free account, define your habits, download the extension, and begin your recovery — all in under five minutes.</p>
+    <div class="cta-btns">
+      <a class="btn btn-g btn-lg" href="login.html#register">Create Free Account</a>
+      <a class="btn btn-ghost btn-lg" href="#sec-dl">Download Extension</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div>
+    <div class="sf-logo">Rhythm<span>.</span></div>
+    <div class="sf-tagline">Getting back in tune.</div>
+  </div>
+  <ul class="sf-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="app.html#habits">Habits</a></li>
+    <li><a href="app.html#analytics">Analytics</a></li>
+    <li><a href="#sec-dl">Extension</a></li>
+    <li><a href="login.html">Sign In</a></li>
+    <li><a href="#">Privacy Policy</a></li>
+  </ul>
+</footer>
+
+<script>
+/* Scroll reveal */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }
+  });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+/* Toast utility */
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type === 'err' ? 'terr show' : 'show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* Redirect logged-in users straight to app */
+const stored = localStorage.getItem('rhythmUser');
+if (stored) {
+  try {
+    const u = JSON.parse(stored);
+    if (u && u.email) {
+      // Show a subtle "Welcome back" chip in nav
+      const nc = document.querySelector('.nav-cta');
+      nc.innerHTML = `
+        <span style="font-size:.78rem;color:var(--mid)">Welcome back, ${u.firstName}</span>
+        <a class="btn btn-g btn-sm" href="app.html">Open Dashboard</a>
+      `;
+    }
+  } catch(e) {}
+}
+</script>
+</body>
+</html>

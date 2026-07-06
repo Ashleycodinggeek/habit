@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Rhythm — Sign In / Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+/* ── LOGIN PAGE LAYOUT ───────────────────────────────────── */
+body { background: var(--off); }
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Left panel — branding */
+.auth-left {
+  background: linear-gradient(160deg, var(--g) 0%, var(--gm) 100%);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.auth-left::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 80% 20%, rgba(255,255,255,.05) 0%, transparent 70%);
+}
+
+/* Decorative rings on left panel */
+.al-rings {
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 400px; height: 400px;
+  opacity: .08;
+}
+.al-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid #fff;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  animation: pr 6s ease-in-out infinite;
+}
+.al-ring:nth-child(1) { width: 120px; height: 120px; animation-delay: 0s; }
+.al-ring:nth-child(2) { width: 240px; height: 240px; animation-delay: 1s; }
+.al-ring:nth-child(3) { width: 360px; height: 360px; animation-delay: 2s; }
+
+.al-logo {
+  position: relative; z-index: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 300;
+  letter-spacing: .12em; color: #fff;
+  text-decoration: none;
+}
+.al-logo span { color: rgba(255,255,255,.55); }
+
+.al-content { position: relative; z-index: 1; }
+.al-content h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 300; color: #fff; line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.al-content h2 em { font-style: italic; color: rgba(255,255,255,.6); }
+.al-content p {
+  font-size: .9rem; color: rgba(255,255,255,.6);
+  line-height: 1.7; max-width: 380px;
+}
+
+/* Testimonial on left panel */
+.al-quote {
+  position: relative; z-index: 1;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--r);
+  padding: 1.25rem 1.4rem;
+}
+.al-quote-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem; color: rgba(255,255,255,.2);
+  line-height: .7; margin-bottom: .5rem;
+}
+.al-quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: .95rem;
+  color: rgba(255,255,255,.75); line-height: 1.6;
+  margin-bottom: .75rem;
+}
+.al-quote-author {
+  font-size: .72rem; color: rgba(255,255,255,.4);
+  letter-spacing: .08em;
+}
+
+/* Feature bullets on left */
+.al-features {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: .65rem;
+}
+.al-feat {
+  display: flex; align-items: center; gap: .65rem;
+  font-size: .82rem; color: rgba(255,255,255,.7);
+}
+.al-feat-ico {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  display: grid; place-items: center;
+  font-size: .65rem; flex-shrink: 0;
+  color: var(--gl);
+}
+
+/* Right panel — form */
+.auth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: var(--w);
+  overflow-y: auto;
+}
+
+.auth-box { width: 100%; max-width: 400px; }
+
+.auth-back-link {
+  display: inline-flex; align-items: center; gap: .4rem;
+  color: var(--mid); text-decoration: none;
+  font-size: .78rem; margin-bottom: 2rem;
+  transition: color .2s;
+}
+.auth-back-link:hover { color: var(--g); }
+
+/* Tabs */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--mist);
+  margin-bottom: 1.75rem;
+}
+.auth-tab {
+  flex: 1; background: none; border: none;
+  padding: .75rem; font-family: 'DM Sans', sans-serif;
+  font-size: .8rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--mid); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all .2s;
+}
+.auth-tab.active { color: var(--g); border-bottom-color: var(--g); font-weight: 500; }
+
+/* Forms */
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+
+/* 2-col name row */
+.name-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+/* Divider */
+.auth-divider {
+  text-align: center; color: var(--mid);
+  font-size: .72rem; margin: 1.25rem 0;
+  position: relative;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; position: absolute;
+  top: 50%; width: 40%; height: 1px;
+  background: var(--mist);
+}
+.auth-divider::before { left: 0; }
+.auth-divider::after  { right: 0; }
+
+.auth-foot {
+  text-align: center; margin-top: 1.25rem;
+  font-size: .78rem; color: var(--mid);
+}
+.auth-foot a { color: var(--b); text-decoration: none; font-weight: 500; }
+.auth-foot a:hover { text-decoration: underline; }
+
+/* Goal cards (visual selection) */
+.goal-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+.goal-card {
+  background: var(--off);
+  border: 1.5px solid var(--mist);
+  border-radius: var(--r);
+  padding: .75rem;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+}
+.goal-card:hover { border-color: var(--gb); background: var(--gs); }
+.goal-card.selected { border-color: var(--g); background: var(--gs); }
+.goal-card.selected .gc-title { color: var(--g); }
+.gc-ico { font-size: 1.1rem; margin-bottom: .3rem; }
+.gc-title { font-size: .78rem; font-weight: 500; color: var(--dim); }
+.gc-desc  { font-size: .65rem; color: var(--mid); margin-top: .1rem; line-height: 1.4; }
+
+/* Terms checkbox */
+.terms-row {
+  display: flex; align-items: flex-start; gap: .6rem;
+  margin-bottom: 1rem;
+}
+.terms-row input[type="checkbox"] { accent-color: var(--g); margin-top: 3px; flex-shrink: 0; }
+.terms-row label {
+  font-size: .75rem; color: var(--mid); line-height: 1.5;
+}
+.terms-row label a { color: var(--b); text-decoration: none; }
+
+/* Submit error banner */
+.form-error {
+  background: var(--bs);
+  border: 1px solid var(--bb);
+  border-radius: var(--r);
+  padding: .65rem .9rem;
+  font-size: .78rem; color: var(--b);
+  margin-bottom: 1rem;
+  display: none;
+}
+.form-error.show { display: block; }
+
+/* Forgot password */
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+.forgot-row a {
+  font-size: .73rem; color: var(--b);
+  text-decoration: none;
+}
+.forgot-row a:hover { text-decoration: underline; }
+
+/* Success state */
+.auth-success {
+  display: none;
+  text-align: center;
+  padding: 2rem 0;
+}
+.auth-success .s-ico {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--gs);
+  border: 1px solid var(--gb);
+  display: grid; place-items: center;
+  margin: 0 auto 1.25rem;
+  font-size: 1.8rem;
+}
+.auth-success h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 300;
+  color: var(--g); margin-bottom: .6rem;
+}
+.auth-success p { font-size: .85rem; color: var(--mid); line-height: 1.6; }
+
+/* Responsive */
+@media (max-width: 760px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-left { display: none; }
+  .auth-right { min-height: 100vh; padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<div class="auth-page">
+
+  <!-- ═══ LEFT PANEL ══════════════════════════════════════ -->
+  <div class="auth-left">
+
+    <!-- Logo -->
+    <a class="al-logo" href="index.html">Rhythm<span>.</span></a>
+
+    <!-- Decorative rings -->
+    <div class="al-rings">
+      <div class="al-ring"></div>
+      <div class="al-ring"></div>
+      <div class="al-ring"></div>
+    </div>
+
+    <!-- Headline -->
+    <div class="al-content">
+      <h2 class="serif">Get back<br/><em>in tune</em><br/>with yourself.</h2>
+      <p style="margin-top:1rem">Rhythm combines habit tracking, focus sessions, and intelligent site blocking into one calm, privacy-first system.</p>
+
+      <!-- Feature bullets -->
+      <div class="al-features" style="margin-top:1.5rem">
+        <div class="al-feat"><div class="al-feat-ico">◎</div>Daily habit creation and logging</div>
+        <div class="al-feat"><div class="al-feat-ico">◷</div>Pomodoro focus timer with blocking</div>
+        <div class="al-feat"><div class="al-feat-ico">⊘</div>136+ distracting sites blocked</div>
+        <div class="al-feat"><div class="al-feat-ico">↗</div>Real-time analytics dashboard</div>
+        <div class="al-feat"><div class="al-feat-ico">🔒</div>100% local — zero data collected</div>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <div class="al-quote">
+      <div class="al-quote-mark">"</div>
+      <p class="al-quote-text">After ninety days I got my mornings back. Rhythm doesn't shame you — it quietly removes the option.</p>
+      <div class="al-quote-author">— Daniel M., Software engineer, Nairobi · 90 days clean</div>
+    </div>
+
+  </div>
+
+  <!-- ═══ RIGHT PANEL — FORM ══════════════════════════════ -->
+  <div class="auth-right">
+    <div class="auth-box">
+
+      <!-- Back link -->
+      <a class="auth-back-link" href="index.html">← Back to homepage</a>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab"        id="tab-register" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- ── LOGIN FORM ──────────────────────────────────── -->
+      <div class="auth-form active" id="form-login">
+
+        <div class="form-error" id="login-err">
+          Incorrect email or password. Please try again.
+        </div>
+
+        <div class="field" id="fl-em">
+          <label for="lEm">Email Address</label>
+          <input type="email" id="lEm" placeholder="you@example.com" autocomplete="email"/>
+          <span class="emsg">Please enter a valid email address</span>
+        </div>
+
+        <div class="field" id="fl-pw">
+          <label for="lPw">Password</label>
+          <div class="pwd-wrap">
+            <input type="password" id="lPw" placeholder="Your password" autocomplete="current-password"/>
+            <button class="pwd-eye" onclick="tglPwd('lPw',this)" type="button" aria-label="Show password">👁</button>
+          </div>
+          <span class="emsg">Password is required</span>
+        </div>
+
+        <div class="forgot-row">
+          <a href="#" onclick="showForgot()">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-g" style="width:100%;justify-content:center" onclick="handleLogin()">
+          Sign In →
+        </button>
+
+        <div class="auth-foot">
+          No account yet? <a href="#" onclick="switchTab('register')">Create one free</a>
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ───────────────────────────────── -->
+      <div class="auth-form" id="form-register">
+
+        <div class="name-row">
+          <div class="field" id="fr-fn">
+            <label for="rFn">First Name</label>
+            <input type="text" id="rFn" placeholder="Jane" autocomplete="given-name"/>
+            <span class="emsg">Required</span>
+          </div>
+          <div class="field" id="fr-ln">
+            <label for="rLn">Last Name</label>
+            <input type="text" id="rLn" placeholder="Doe" autocomplete="family-name"/>
+            <span class="emsg">Required</span>
+          </div>
+        </div>
+
+        <div class="field" id="fr-em">
+          <label for="rEm">Email Address</label>
+          <input type="email" id="rEm" placeholder="you@example.com" autocomplete="email"/>
+          <span class="emsg">Please enter a valid email address</span>
+        </div>
+
+        <div class="field" id="fr-pw">
+          <label for="rPw">Password</label>
+          <div class="pwd-wrap">
+            <input type="password" id="rPw" placeholder="Min 8 characters"
+                   autocomplete="new-password" oninput="checkStr(this.value)"/>
+            <button class="pwd-eye" onclick="tglPwd('rPw',this)" type="button" aria-label="Show password">👁</button>
+          </div>
+          <div class="str-bar"><div class="str-fill" id="strFill"></div></div>
+          <div class="str-lbl" id="strLbl">Enter a password to see strength</div>
+          <span class="emsg">Password must be at least 8 characters</span>
+        </div>
+
+        <!-- Goal selection — HCI #2 match real world with icons -->
+        <div class="field">
+          <label>Primary Goal <span style="color:var(--b)">*</span></label>
+          <span class="hint">Helps us personalise your starting habits</span>
+          <div class="goal-cards" id="goalCards" style="margin-top:.5rem">
+            <div class="goal-card" onclick="selectGoal('productivity',this)">
+              <div class="gc-ico">💼</div>
+              <div class="gc-title">Productivity</div>
+              <div class="gc-desc">Improve focus and time management</div>
+            </div>
+            <div class="goal-card" onclick="selectGoal('gambling',this)">
+              <div class="gc-ico">⚖️</div>
+              <div class="gc-title">Gambling Recovery</div>
+              <div class="gc-desc">Overcome betting addiction</div>
+            </div>
+            <div class="goal-card" onclick="selectGoal('adult',this)">
+              <div class="gc-ico">🌿</div>
+              <div class="gc-title">Digital Recovery</div>
+              <div class="gc-desc">Overcome pornography addiction</div>
+            </div>
+            <div class="goal-card" onclick="selectGoal('general',this)">
+              <div class="gc-ico">◎</div>
+              <div class="gc-title">General Wellness</div>
+              <div class="gc-desc">Build healthy digital habits</div>
+            </div>
+          </div>
+          <div class="emsg" id="goal-err" style="display:none">Please select a primary goal</div>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="terms"/>
+          <label for="terms">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+            I understand my data stays on my device.
+          </label>
+        </div>
+        <div class="emsg" id="terms-err" style="display:none;margin-bottom:.75rem">Please accept the terms to continue</div>
+
+        <button class="btn btn-g" style="width:100%;justify-content:center" onclick="handleRegister()">
+          Create Account →
+        </button>
+
+        <div class="auth-foot">
+          Already registered? <a href="#" onclick="switchTab('login')">Sign in</a>
+        </div>
+      </div>
+
+      <!-- ── SUCCESS STATE ───────────────────────────────── -->
+      <div class="auth-success" id="authSuccess">
+        <div class="s-ico">🌿</div>
+        <h3 class="serif">Welcome to Rhythm.</h3>
+        <p>Your account has been created. Redirecting you to your dashboard…</p>
+        <div style="margin-top:1.5rem">
+          <a class="btn btn-g" href="app.html" style="width:100%;justify-content:center">
+            Open Dashboard →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── STATE ──────────────────────────────────────────────── */
+let selectedGoal = '';
+
+/* ── TAB SWITCH ─────────────────────────────────────────── */
+function switchTab(tab) {
+  ['login','register'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('form-'+t).classList.toggle('active', t===tab);
+  });
+  document.getElementById('authSuccess').style.display = 'none';
+}
+
+/* ── GOAL SELECTION ─────────────────────────────────────── */
+function selectGoal(goal, el) {
+  selectedGoal = goal;
+  document.querySelectorAll('.goal-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('goal-err').style.display = 'none';
+}
+
+/* ── PASSWORD UTILS ─────────────────────────────────────── */
+function tglPwd(id, btn) {
+  const i = document.getElementById(id);
+  const show = i.type === 'password';
+  i.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+function checkStr(v) {
+  const f = document.getElementById('strFill');
+  const l = document.getElementById('strLbl');
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const colors = ['#e07070','var(--wa)','var(--gl)','var(--g)'];
+  const labels = ['Weak — add uppercase or numbers','Fair — getting stronger','Good — almost there','Strong — great password'];
+  f.style.width = (s / 4 * 100) + '%';
+  f.style.background = colors[s-1] || 'var(--mist)';
+  l.textContent = s ? labels[s-1] : 'Enter a password to see strength';
+}
+
+/* ── VALIDATION ─────────────────────────────────────────── */
+function setInv(id, v) { document.getElementById(id).classList.toggle('err', v); }
+
+/* ── LOGIN ──────────────────────────────────────────────── */
+function handleLogin() {
+  const em = document.getElementById('lEm').value.trim();
+  const pw = document.getElementById('lPw').value;
+  let ok = true;
+
+  if (!em || !/\S+@\S+\.\S+/.test(em)) { setInv('fl-em', true); ok = false; }
+  else setInv('fl-em', false);
+
+  if (!pw) { setInv('fl-pw', true); ok = false; }
+  else setInv('fl-pw', false);
+
+  if (!ok) return;
+
+  const raw = localStorage.getItem('rhythmUser');
+  if (!raw) {
+    document.getElementById('login-err').classList.add('show');
+    return;
+  }
+
+  const u = JSON.parse(raw);
+  if (u.email !== em) {
+    document.getElementById('login-err').classList.add('show');
+    return;
+  }
+
+  document.getElementById('login-err').classList.remove('show');
+
+  // Set logged in session
+  const appRaw = localStorage.getItem('rhythmApp');
+  let appData = appRaw ? JSON.parse(appRaw) : {};
+  appData.user = u;
+  localStorage.setItem('rhythmApp', JSON.stringify(appData));
+
+  toast('Welcome back, ' + u.firstName + '! 🌿');
+  setTimeout(() => { window.location.href = 'app.html'; }, 700);
+}
+
+/* ── REGISTER ───────────────────────────────────────────── */
+function handleRegister() {
+  const fn = document.getElementById('rFn').value.trim();
+  const ln = document.getElementById('rLn').value.trim();
+  const em = document.getElementById('rEm').value.trim();
+  const pw = document.getElementById('rPw').value;
+  const tc = document.getElementById('terms').checked;
+
+  let ok = true;
+  if (!fn)  { setInv('fr-fn', true); ok = false; } else setInv('fr-fn', false);
+  if (!ln)  { setInv('fr-ln', true); ok = false; } else setInv('fr-ln', false);
+  if (!em || !/\S+@\S+\.\S+/.test(em)) { setInv('fr-em', true); ok = false; } else setInv('fr-em', false);
+  if (!pw || pw.length < 8) { setInv('fr-pw', true); ok = false; } else setInv('fr-pw', false);
+  if (!selectedGoal) { document.getElementById('goal-err').style.display = 'block'; ok = false; }
+  if (!tc) { document.getElementById('terms-err').style.display = 'block'; ok = false; }
+
+  if (!ok) return;
+
+  const user = { firstName:fn, lastName:ln, email:em, goal:selectedGoal, createdAt:Date.now() };
+  localStorage.setItem('rhythmUser', JSON.stringify(user));
+
+  // Initialise app state with seeded habits
+  const habits = [];
+  const seedBase = [
+    { name:'Morning Walk', desc:'20 min outdoor walk', cat:'health', icon:'🏃', freq:'daily', target:1 },
+    { name:'Read 30 min',  desc:'Any book or article', cat:'learning', icon:'📖', freq:'daily', target:1 },
+    { name:'Drink 8 glasses', desc:'Stay hydrated', cat:'health', icon:'💧', freq:'daily', target:8 },
+  ];
+  if (selectedGoal === 'gambling' || selectedGoal === 'adult') {
+    seedBase.push({ name:'Daily Reflection', desc:'Journal about triggers', cat:'recovery', icon:'🌿', freq:'daily', target:1 });
+  }
+  seedBase.forEach(s => habits.push({ ...s, id:uid(), createdAt:Date.now(), logs:[] }));
+
+  const appData = {
+    user, habits, sessions:[],
+    streakStart: Date.now(),
+    totalBlocks: 0,
+    pornEnabled: true,
+    gamblingEnabled: true,
+    customDomains: [],
+    sessDomains: [],
+    blocksByType: { porn:0, gamb:0, custom:0 }
+  };
+  localStorage.setItem('rhythmApp', JSON.stringify(appData));
+
+  // Show success state
+  document.getElementById('form-register').style.display = 'none';
+  document.getElementById('authSuccess').style.display = 'block';
+  setTimeout(() => { window.location.href = 'app.html'; }, 2000);
+}
+
+/* ── FORGOT PASSWORD ─────────────────────────────────────── */
+function showForgot() {
+  toast('Password recovery would be sent to your email in a production system.', 'info');
+}
+
+/* ── HELPERS ─────────────────────────────────────────────── */
+function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type === 'err' ? 'terr show' : 'show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ── BOOT — redirect if already logged in ───────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  const raw = localStorage.getItem('rhythmApp');
+  if (raw) {
+    try {
+      const d = JSON.parse(raw);
+      if (d.user && d.user.email) {
+        window.location.href = 'app.html';
+        return;
+      }
+    } catch(e) {}
+  }
+  // Check URL hash for direct tab routing
+  if (window.location.hash === '#register') switchTab('register');
+});
+</script>
+</body>
+</html>
