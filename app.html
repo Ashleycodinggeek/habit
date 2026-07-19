@@ -565,7 +565,7 @@
             <span class="hint">Completing session logs toward that habit</span>
           </div>
           <div class="field">
-            <label>Extra sites to block this session</label>
+            <label>Always block these sites</label>
             <div class="dom-row">
               <input class="dom-inp" type="text" id="sDomInp" placeholder="e.g. youtube.com"/>
               <button class="btn btn-ghost btn-sm" onclick="addSessDom()">+ Add</button>
@@ -591,7 +591,7 @@
           </div>
           <div class="rtm-row"><span class="rtm-nm">Pornography (99+)</span><span class="rtm-ct" id="rtmPorn">blocking</span></div>
           <div class="rtm-row"><span class="rtm-nm">Gambling (37+)</span><span class="rtm-ct" id="rtmGamb">blocking</span></div>
-          <div class="rtm-row"><span class="rtm-nm">Session custom</span><span class="rtm-ct" id="rtmCust">0 domains</span></div>
+          <div class="rtm-row"><span class="rtm-nm">Custom blocking</span><span class="rtm-ct" id="rtmCust">0 domains</span></div>
           <div class="rtm-row"><span class="rtm-nm">All-time total</span><span class="rtm-ct" id="rtmTotal">0</span></div>
         </div>
 
@@ -814,6 +814,8 @@ let APP = {
 
 /* ─── PERSISTENCE ────────────────────────────── */
 function save() {
+  if (!Array.isArray(APP.customDomains)) APP.customDomains = [];
+  if (!Array.isArray(APP.sessDomains)) APP.sessDomains = [];
   localStorage.setItem('rhythmApp', JSON.stringify(APP));
   if (IS_EXT) try {
     chrome.storage.local.set({
@@ -830,12 +832,19 @@ function save() {
 function load() {
   const raw = localStorage.getItem('rhythmApp');
   if (raw) { try { Object.assign(APP, JSON.parse(raw)); } catch(e){} }
+  if (!Array.isArray(APP.customDomains)) APP.customDomains = [];
+  if (!Array.isArray(APP.sessDomains)) APP.sessDomains = [];
   if (!APP.blocksByType) APP.blocksByType = { porn:0, gamb:0, custom:0 };
   if (IS_EXT) try {
-    chrome.storage.local.get(['totalBlocks','streakStart','blocksByType'], r => {
+    chrome.storage.local.get(['customDomains','totalBlocks','streakStart','blocksByType','pornEnabled','gamblingEnabled'], r => {
+      if (Array.isArray(r.customDomains)) APP.customDomains = r.customDomains;
+      if (r.pornEnabled !== undefined) APP.pornEnabled = r.pornEnabled;
+      if (r.gamblingEnabled !== undefined) APP.gamblingEnabled = r.gamblingEnabled;
       if (r.totalBlocks  !== undefined) APP.totalBlocks  = r.totalBlocks;
       if (r.streakStart  !== undefined) APP.streakStart  = r.streakStart;
       if (r.blocksByType)              APP.blocksByType  = r.blocksByType;
+      save();
+      try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
       renderDash();
     });
   } catch(e){}
@@ -1097,7 +1106,9 @@ function renderFocusView() {
     o.value = h.id; o.textContent = h.icon+' '+h.name;
     sel.appendChild(o);
   });
-  updateRTM(); updatePomoDots();
+  renderSessTags();
+  updateRTM();
+  updatePomoDots();
 }
 
 function setPreset(w, b, btn) {
@@ -1226,26 +1237,42 @@ function addSLog(msg) {
   list.prepend(row);
 }
 
+function normalizeDomain(value) {
+  let v = String(value || '').trim().toLowerCase();
+  v = v.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+  v = v.replace(/[^a-z0-9.-]/g, '');
+  v = v.replace(/^\.+|\.+$/g, '');
+  if (!v) return '';
+  if (!v.includes('.')) v = `${v}.com`;
+  return v;
+}
+
 function addSessDom() {
   const inp = document.getElementById('sDomInp');
-  let v = inp.value.trim().toLowerCase()
-    .replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/.*/,'');
-  if (!v || APP.sessDomains.includes(v)) { inp.value=''; return; }
-  APP.sessDomains.push(v); inp.value='';
+  const v = normalizeDomain(inp.value);
+  if (!v) { inp.value=''; return; }
+  if (APP.customDomains.includes(v)) { inp.value=''; return; }
+  APP.customDomains.push(v); inp.value='';
   renderSessTags(); updateRTM();
-  if (IS_EXT) try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains:[...APP.customDomains,...APP.sessDomains]}); } catch(e){}
-  toast('Blocking '+v+' this session');
+  save();
+  if (IS_EXT) try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
+  toast('Blocking '+v+' always');
 }
 
 function renderSessTags() {
-  document.getElementById('sDomTags').innerHTML = APP.sessDomains.map(d=>
-    `<span class="badge bg-m" style="cursor:pointer" onclick="rmSD('${esc(d)}')">${esc(d)} ×</span>`
+  const wrap = document.getElementById('sDomTags');
+  if (!wrap) return;
+  wrap.innerHTML = APP.customDomains.map(d=>
+    `<span class="badge bg-m" style="display:inline-flex;align-items:center;gap:.35rem;cursor:pointer" title="Remove this block" onclick="rmSD('${esc(d)}')">${esc(d)} <span style="font-weight:700">×</span></span>`
   ).join('');
 }
 
 function rmSD(d) {
-  APP.sessDomains = APP.sessDomains.filter(x=>x!==d);
+  APP.customDomains = APP.customDomains.filter(x=>x!==d);
   renderSessTags(); updateRTM();
+  save();
+  if (IS_EXT) try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
+  toast('Unblocked '+d);
 }
 
 function updateRTM() {
@@ -1254,7 +1281,7 @@ function updateRTM() {
   const sb = document.getElementById('ssBlocks');
   if(pe) pe.textContent = APP.pornEnabled?'blocking 99+':'paused';
   if(ge) ge.textContent = APP.gamblingEnabled?'blocking 37+':'paused';
-  if(ce) ce.textContent = (APP.customDomains.length+APP.sessDomains.length)+' domains';
+  if(ce) ce.textContent = APP.customDomains.length+' domains';
   if(te) te.textContent = APP.totalBlocks;
   if(sb) sb.textContent = TM.sessBlocks;
 }
