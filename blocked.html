@@ -96,50 +96,12 @@ h1 em{font-style:italic;color:var(--b)}
     <cite>— Rhythm</cite>
   </div>
   <div class="actions">
-    <button class="btn-back" onclick="goBack()">← Go back</button>
-    <button class="btn-dash" onclick="openDash()">Open Dashboard</button>
+    <button class="btn-back" id="goBackBtn" type="button">← Go back</button>
+    <button class="btn-dash" id="openDashBtn" type="button">Open Dashboard</button>
   </div>
-  <p class="footer-note">This site is on your block list. <a href="#" onclick="openDash()">Edit your settings</a></p>
+  <p class="footer-note">This site is on your block list. <a href="#" id="editSettingsLink">Edit your settings</a></p>
   <div class="breathe">Breathe in · Breathe out</div>
 </div>
-<script>
-const params = new URLSearchParams(window.location.search);
-const type   = params.get('type') || 'porn';
-const site   = params.get('site') || 'this site';
-document.getElementById('blockedSite').textContent = decodeURIComponent(site);
-const icons = {porn:'🌿', gambling:'⚖️', custom:'🔒'};
-document.getElementById('blockIcon').textContent = icons[type] || '🔒';
-const affs = [
-  "The version of you that set this block was thinking clearly. Trust that person.",
-  "Every moment you don't visit this site, you are choosing the life you want.",
-  "Real freedom is choosing your own restrictions.",
-  "The urge will pass. It always does. Give it five minutes.",
-  "You deserve the life that exists on the other side of this habit.",
-  "Your future self will thank the person who made this choice today.",
-  "Discipline is choosing your future self over your present impulse.",
-  "One redirect is not recovery — but it is one step. That is enough.",
-  "You are not broken. You are someone working on themselves.",
-  "Consistency, not perfection, is what builds a new identity."
-];
-const d = new Date();
-document.getElementById('affirmText').textContent = '"' + affs[(d.getDate()+d.getMonth())%affs.length] + '"';
-// Record block in extension and categorise it
-try {
-  chrome.runtime.sendMessage({ type:'RECORD_BLOCK', category: type==='porn'?'porn':type==='gambling'?'gambling':'custom' });
-} catch(e){}
-function goBack(){
-  if(window.history.length>1) window.history.back();
-  else window.location.href='chrome://newtab';
-}
-function openDash(){
-  try{
-    const url = chrome.runtime.getURL('index.html');
-    chrome.tabs.query({url}, tabs=>{
-      if(tabs&&tabs.length>0) chrome.tabs.update(tabs[0].id,{active:true});
-      else chrome.tabs.create({url});
-    });
-  }catch(e){ window.history.back(); }
-}
-</script>
+<script src="blocked.js"></script>
 </body>
 </html>

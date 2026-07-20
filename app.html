@@ -832,22 +832,27 @@ function save() {
 function load() {
   const raw = localStorage.getItem('rhythmApp');
   if (raw) { try { Object.assign(APP, JSON.parse(raw)); } catch(e){} }
-  if (!Array.isArray(APP.customDomains)) APP.customDomains = [];
-  if (!Array.isArray(APP.sessDomains)) APP.sessDomains = [];
   if (!APP.blocksByType) APP.blocksByType = { porn:0, gamb:0, custom:0 };
-  if (IS_EXT) try {
-    chrome.storage.local.get(['customDomains','totalBlocks','streakStart','blocksByType','pornEnabled','gamblingEnabled'], r => {
-      if (Array.isArray(r.customDomains)) APP.customDomains = r.customDomains;
-      if (r.pornEnabled !== undefined) APP.pornEnabled = r.pornEnabled;
-      if (r.gamblingEnabled !== undefined) APP.gamblingEnabled = r.gamblingEnabled;
-      if (r.totalBlocks  !== undefined) APP.totalBlocks  = r.totalBlocks;
-      if (r.streakStart  !== undefined) APP.streakStart  = r.streakStart;
-      if (r.blocksByType)              APP.blocksByType  = r.blocksByType;
-      save();
-      try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
-      renderDash();
-    });
-  } catch(e){}
+  if (!APP.customDomains) APP.customDomains = [];
+  if (!APP.sessDomains)   APP.sessDomains   = [];
+
+  if (IS_EXT) {
+    try {
+      chrome.storage.local.get(['totalBlocks','streakStart','blocksByType'], r => {
+        if (r.totalBlocks  !== undefined) APP.totalBlocks  = r.totalBlocks;
+        if (r.streakStart  !== undefined) APP.streakStart  = r.streakStart;
+        if (r.blocksByType)               APP.blocksByType = r.blocksByType;
+        renderDash();
+      });
+    } catch(e) {}
+
+    // Re-apply persistent custom domains to the extension every time the
+    // dashboard opens — this handles the case where the user added domains
+    // in a previous session and has just reopened the app
+    if (APP.customDomains.length > 0) {
+      syncCustomDomainsToExtension();
+    }
+  }
 }
 
 /* ─── VIEW ROUTER ───────────────────────────── */
@@ -1249,14 +1254,21 @@ function normalizeDomain(value) {
 
 function addSessDom() {
   const inp = document.getElementById('sDomInp');
-  const v = normalizeDomain(inp.value);
-  if (!v) { inp.value=''; return; }
-  if (APP.customDomains.includes(v)) { inp.value=''; return; }
-  APP.customDomains.push(v); inp.value='';
+  let v = inp.value.trim().toLowerCase()
+    .replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/.*/,'');
+  if (!v || APP.sessDomains.includes(v)) { inp.value=''; return; }
+  APP.sessDomains.push(v); inp.value='';
   renderSessTags(); updateRTM();
-  save();
-  if (IS_EXT) try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
-  toast('Blocking '+v+' always');
+  // Send ALL custom domains (persistent + session) to the extension
+  syncCustomDomainsToExtension();
+  toast('Blocking '+v+' this session');
+}
+
+function rmSD(d) {
+  APP.sessDomains = APP.sessDomains.filter(x=>x!==d);
+  renderSessTags(); updateRTM();
+  // Re-sync so session domain is immediately unblocked
+  syncCustomDomainsToExtension();
 }
 
 function renderSessTags() {
@@ -1267,12 +1279,19 @@ function renderSessTags() {
   ).join('');
 }
 
-function rmSD(d) {
-  APP.customDomains = APP.customDomains.filter(x=>x!==d);
-  renderSessTags(); updateRTM();
-  save();
-  if (IS_EXT) try { chrome.runtime.sendMessage({type:'UPDATE_CUSTOM_DOMAINS',domains: APP.customDomains}); } catch(e){}
-  toast('Unblocked '+d);
+// Sends the combined list of persistent custom domains + active session domains
+// to background.js so the extension blocks ALL of them immediately.
+// This is called whenever either list changes.
+function syncCustomDomainsToExtension() {
+  const allDomains = [...new Set([...APP.customDomains, ...APP.sessDomains])];
+  if (IS_EXT) {
+    try {
+      chrome.runtime.sendMessage({
+        type:    'UPDATE_CUSTOM_DOMAINS',
+        domains: allDomains
+      });
+    } catch(e) {}
+  }
 }
 
 function updateRTM() {

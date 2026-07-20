@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Rhythm — Reclaim Your Focus",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Habit tracking, focus sessions, and intelligent site blocking — all connected to your Rhythm dashboard.",
   "permissions": [
     "storage",
